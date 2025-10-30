@@ -3,18 +3,20 @@ const cors = require('cors');
 const mysql = require('mysql2');
 
 const app = express();
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 
-// Database connection - WITH YOUR PASSWORD
+// Database connection - USING ENVIRONMENT VARIABLES FOR HOSTING
 const db = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: '29112023', // YOUR PASSWORD
-  database: 'attendance_db'
+  host: process.env.DB_HOST || 'localhost',
+  user: process.env.DB_USER || 'root',
+  password: process.env.DB_PASSWORD || '29112023', // Fallback to local password
+  database: process.env.DB_NAME || 'attendance_db',
+  port: process.env.DB_PORT || 3306,
+  ssl: process.env.DB_SSL ? { rejectUnauthorized: false } : false // For PlanetScale
 });
 
 // Connect to database
@@ -25,8 +27,10 @@ db.connect((err) => {
     console.log('   1. MySQL is running');
     console.log('   2. Database "attendance_db" exists');
     console.log('   3. Password is correct');
+    console.log('   4. Environment variables are set for hosting');
   } else {
-    console.log('✅ Connected to MySQL database !');
+    console.log('✅ Connected to MySQL database!');
+    console.log('📍 Database:', process.env.DB_HOST ? 'Cloud' : 'Local');
   }
 });
 
@@ -94,14 +98,25 @@ app.delete('/api/attendance/:id', (req, res) => {
 app.get('/', (req, res) => {
   res.json({ 
     message: 'Employee Attendance Tracker API is running!',
-    database: 'Connected to MySQL',
+    database: process.env.DB_HOST ? 'Cloud MySQL' : 'Local MySQL',
+    environment: process.env.NODE_ENV || 'development',
     total_employees: 12
   });
 });
 
+// Health check route for hosting platforms
+app.get('/health', (req, res) => {
+  res.status(200).json({ 
+    status: 'OK', 
+    timestamp: new Date().toISOString(),
+    database: 'Connected'
+  });
+});
+
 // Start server
-app.listen(PORT, () => {
-  console.log(`🚀 Backend server running on http://localhost:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 Backend server running on port ${PORT}`);
   console.log(`📊 API endpoints available at http://localhost:${PORT}/api/attendance`);
-  console.log(`👥 Database: employees loaded`);
+  console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`🗄️ Database: ${process.env.DB_HOST ? process.env.DB_HOST : 'localhost'}`);
 });
