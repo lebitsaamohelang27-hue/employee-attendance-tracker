@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
+const API_URL = 'https://employee-backend-q0c1.onrender.com';
+
 const AttendanceForm = ({ onAttendanceAdded }) => {
   const [formData, setFormData] = useState({
     employeeName: '',
@@ -24,7 +26,7 @@ const AttendanceForm = ({ onAttendanceAdded }) => {
     setMessage({ type: '', text: '' });
 
     try {
-      const response = await axios.post('http://localhost:5000/api/attendance', formData);
+      const response = await axios.post(`${API_URL}/api/attendance`, formData);
       
       setMessage({ 
         type: 'success', 

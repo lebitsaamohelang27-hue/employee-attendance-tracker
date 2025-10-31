@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
+const API_URL = 'https://employee-backend-q0c1.onrender.com';
+
 const AttendanceDashboard = () => {
   const [attendance, setAttendance] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -11,7 +13,7 @@ const AttendanceDashboard = () => {
 
   const fetchAttendance = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/attendance');
+      const response = await axios.get(`${API_URL}/api/attendance`);
       setAttendance(response.data);
     } catch (error) {
       console.error('Error:', error);
