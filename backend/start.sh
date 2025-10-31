@@ -1,3 +1,4 @@
 #!/bin/bash 
-echo "?? Starting backend on Railway..." 
+cd backend 
 npm install 
+npm start 
