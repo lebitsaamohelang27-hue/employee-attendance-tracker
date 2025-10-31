@@ -8,6 +8,9 @@ const ViewAttendance = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  // ✅ Use your Render backend URL here
+  const API_BASE_URL = 'https://employee-backend-q0c1.onrender.com';
+
   useEffect(() => {
     fetchAttendance();
   }, []);
@@ -16,11 +19,11 @@ const ViewAttendance = () => {
     try {
       setLoading(true);
       setError('');
-      const response = await axios.get('http://localhost:5000/api/attendance');
+      const response = await axios.get(`${API_BASE_URL}/api/attendance`);
       setAttendance(response.data);
     } catch (error) {
       console.error('Error fetching attendance:', error);
-      setError('Failed to load attendance data. Please check if the server is running.');
+      setError('Failed to load attendance data. Please try again later.');
     } finally {
       setLoading(false);
     }
@@ -29,7 +32,7 @@ const ViewAttendance = () => {
   const handleDelete = async (id, employeeName) => {
     if (window.confirm(`Are you sure you want to delete the attendance record for ${employeeName}?`)) {
       try {
-        await axios.delete(`http://localhost:5000/api/attendance/${id}`);
+        await axios.delete(`${API_BASE_URL}/api/attendance/${id}`);
         fetchAttendance();
       } catch (error) {
         alert('Error deleting record: ' + (error.response?.data?.error || error.message));
@@ -44,7 +47,8 @@ const ViewAttendance = () => {
 
   const filteredAttendance = attendance.filter(record => {
     const matchesDate = !filterDate || record.date === filterDate;
-    const matchesSearch = !searchTerm || 
+    const matchesSearch =
+      !searchTerm ||
       record.employeeName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       record.employeeID.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesDate && matchesSearch;
@@ -67,7 +71,7 @@ const ViewAttendance = () => {
             className="filter-input"
           />
         </div>
-        
+
         <div className="filter-group">
           <label>Search</label>
           <input
@@ -78,10 +82,10 @@ const ViewAttendance = () => {
             className="filter-input"
           />
         </div>
-        
+
         <div className="filter-group">
           <label>&nbsp;</label>
-          <button onClick={clearFilters} className="delete-btn" style={{background: '#6b7280'}}>
+          <button onClick={clearFilters} className="delete-btn" style={{ background: '#6b7280' }}>
             Clear Filters
           </button>
         </div>
@@ -95,11 +99,7 @@ const ViewAttendance = () => {
       </div>
 
       <div className="table-container">
-        {error && (
-          <div className="error">
-            {error}
-          </div>
-        )}
+        {error && <div className="error">{error}</div>}
 
         {loading ? (
           <div className="loading">Loading attendance data...</div>
@@ -126,7 +126,7 @@ const ViewAttendance = () => {
                     </span>
                   </td>
                   <td>
-                    <button 
+                    <button
                       className="delete-btn"
                       onClick={() => handleDelete(record.id, record.employeeName)}
                     >
